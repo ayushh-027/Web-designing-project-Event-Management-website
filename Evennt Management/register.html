@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Happy Moments</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="login-container">
+        <h2>Create Account</h2>
+
+        <form>
+            <label for="fullname">Full Name</label>
+            <input type="text" id="fullname" placeholder="Enter Full Name" required>
+
+            <label for="username">Username</label>
+            <input type="text" id="username" placeholder="Choose a Username" required>
+
+            <label for="email">Email ID</label>
+            <input type="email" id="email" placeholder="Enter Email ID" required>
+
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Create Password" required>
+
+            <label for="confirm-password">Confirm Password</label>
+            <input type="password" id="confirm-password" placeholder="Re-enter Password" required>
+
+            <button type="submit" class="cta-button">Register</button>
+        </form>
+
+        <p>Already have an account? <a href="login.html">Login here</a></p>
+    </div>
+
+    <script>
+        (function(){
+            function getParam(name){ return new URLSearchParams(window.location.search).get(name); }
+            var form = document.querySelector('form');
+            if(!form) return;
+            form.addEventListener('submit', function(e){
+                e.preventDefault();
+                var fullname = document.getElementById('fullname') ? document.getElementById('fullname').value : '';
+                try{ localStorage.setItem('hm_loggedIn','true'); localStorage.setItem('hm_user', fullname || ''); } catch(err){}
+
+                var returnUrl = getParam('returnUrl');
+                if(returnUrl){
+                    try{ returnUrl = decodeURIComponent(returnUrl); } catch(e){}
+                    window.location.href = returnUrl;
+                } else {
+                    window.location.href = 'homepage.html';
+                }
+            });
+        })();
+    </script>
+
+</body>
+</html>

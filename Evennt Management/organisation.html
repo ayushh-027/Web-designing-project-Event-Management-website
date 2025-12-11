@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organisation Services - Happy Moments</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <div class="brand"><a href="homepage.html">Happy Moments</a></div>
+        <div class="feedback-link">
+            <a href="feedback.html">Give Feedback</a>
+        </div>
+    </header>
+
+    <main>
+        <section class="page-content">
+            <h2>Services for Organisations</h2>
+            
+            <div class="filters">
+                <label for="filter-type">Service:</label>
+                <select id="filter-type">
+                    <option value="all">All Services</option>
+                    <option value="catering">Catering</option>
+                    <option value="decoration">Decoration</option>
+                </select>
+                <label for="sort-by">Sort by:</label>
+                <select id="sort-by">
+                    <option value="popularity">Popularity</option>
+                    <option value="pricing">Pricing</option>
+                </select>
+            </div>
+
+            <h3>Event Management Organisations</h3>
+            <div class="service-list">
+                <div class="service-item">
+                    <h4>Elite Corporate Planners (Top-Rated)</h4>
+                    <p><strong>Services:</strong> Full-service conference and gala planning.</p>
+                    <p><strong>Popularity:</strong> 5 Stars</p>
+                </div>
+                <div class="service-item">
+                    <h4>Creative Concepts Ltd.</h4>
+                    <p><strong>Services:</strong> Team-building events and product launches.</p>
+                    <p><strong>Popularity:</strong> 4.5 Stars</p>
+                </div>
+            </div>
+
+            <h3>Catering Options (Separate)</h3>
+            <div class="service-list">
+                <div class="service-item">
+                    <h4>Gourmet Solutions</h4>
+                    <p><strong>Price:</strong> Rs 60,000</p>
+                    <p><strong>Menu:</strong> International, Fine Dining</p>
+                </div>
+                <div class="service-item">
+                    <h4>Local Bites Catering</h4>
+                    <p><strong>Price:</strong> Rs 50,000</p>
+                    <p><strong>Menu:</strong> Buffet, Local Cuisine</p>
+                </div>
+            </div>
+
+            <h3>Decoration Options (Separate)</h3>
+            <div class="service-list">
+                <div class="service-item">
+                    <h4>The Light & Floral Co.</h4>
+                    <p><strong>Price:</strong> Rs 65,000</p>
+                    <p><strong>Style:</strong> Modern, Thematic, Floral</p>
+                </div>
+                <div class="service-item">
+                    <h4>Event Ambience</h4>
+                    <p><strong>Price:</strong> Rs 70,000</p>
+                    <p><strong>Style:</strong> Corporate, Minimalist</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Happy Moments.</p>
+    </footer>
+
+    <script>
+        // Client-side filter & sort for organisation page
+        (function(){
+            function getGroupTypeFromHeader(h3){
+                if(!h3) return 'other';
+                var t = h3.innerText.toLowerCase();
+                if(t.indexOf('catering') !== -1) return 'catering';
+                if(t.indexOf('decoration') !== -1) return 'decoration';
+                if(t.indexOf('event') !== -1 || t.indexOf('organisation') !== -1 || t.indexOf('organisation') !== -1) return 'event';
+                return 'other';
+            }
+
+            function parsePopularity(item){
+                if(!item) return 0;
+                // prefer explicit data-popularity attribute
+                if(item.dataset && item.dataset.popularity){
+                    var dp = parseFloat(item.dataset.popularity);
+                    if(!isNaN(dp)) return dp;
+                }
+                var ps = Array.from(item.querySelectorAll('p'));
+                for(var i=0;i<ps.length;i++){
+                    var t = ps[i].innerText || '';
+                    if(/popularity/i.test(t)){
+                        var m = t.match(/(\d+(?:\.\d+)?)/);
+                        if(m) return parseFloat(m[1]);
+                    }
+                }
+                var h4 = item.querySelector('h4');
+                if(h4){ var mm = h4.innerText.match(/(\d+(?:\.\d+)?)/); if(mm) return parseFloat(mm[1]);
+                    if(/top\s*-?rated/i.test(h4.innerText)) return 5;
+                }
+                return 0;
+            }
+
+            function parseDollarCount(item){
+                // Try to find an explicit Rupee price first (e.g., 'Price: Rs 60,000')
+                if(!item) return Infinity;
+                var ps = Array.from(item.querySelectorAll('p'));
+                for(var i=0;i<ps.length;i++){
+                    var t = ps[i].innerText || '';
+                    var mRs = t.match(/(?:rs|₹)\s*([0-9,]+)/i);
+                    if(mRs){
+                        return parseInt(mRs[1].replace(/,/g,''),10);
+                    }
+                    if(/pricing/i.test(t) && /\$/.test(t)){
+                        var m = t.match(/\$+/g);
+                        if(m) return m.join('').length;
+                    }
+                }
+                return Infinity;
+            }
+
+            // annotate groups with data-type for simpler filtering
+            var container = document.querySelector('section.page-content');
+            if(container){
+                var nodes = Array.from(container.querySelectorAll('h3'));
+                nodes.forEach(function(h3){
+                    var next = h3.nextElementSibling;
+                    if(next && next.classList && next.classList.contains('service-list')){
+                        next.setAttribute('data-type', getGroupTypeFromHeader(h3));
+                    }
+                });
+            }
+
+            var filter = document.getElementById('filter-type');
+            var sortSel = document.getElementById('sort-by');
+
+            function applyFilter(){
+                var val = filter ? filter.value : 'all';
+                document.querySelectorAll('.service-list[data-type]').forEach(function(list){
+                    var type = list.getAttribute('data-type');
+                    var h = list.previousElementSibling;
+                    if(val === 'all' || type === val){
+                        list.style.display = '';
+                        if(h && h.tagName.toLowerCase() === 'h3') h.style.display = '';
+                    } else {
+                        list.style.display = 'none';
+                        if(h && h.tagName.toLowerCase() === 'h3') h.style.display = 'none';
+                    }
+                });
+            }
+
+            function applySort(){
+                var mode = sortSel ? sortSel.value : 'popularity';
+                document.querySelectorAll('.service-list[data-type]').forEach(function(list){
+                    if(list.style.display === 'none') return;
+                    var items = Array.from(list.querySelectorAll('.service-item'));
+                    items.sort(function(a,b){
+                        if(mode === 'pricing'){
+                            return parseDollarCount(a) - parseDollarCount(b);
+                        }
+                        return parsePopularity(b) - parsePopularity(a);
+                    });
+                    items.forEach(function(it){ list.appendChild(it); });
+                });
+            }
+
+            if(filter) filter.addEventListener('change', function(){ applyFilter(); applySort(); });
+            if(sortSel) sortSel.addEventListener('change', applySort);
+
+            // initial
+            applyFilter(); applySort();
+        })();
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Moments - Event Management</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <div class="brand">Happy Moments</div>
+
+        <div class="header-right">
+            <a href="login.html" class="login-btn">Login</a>
+            <div class="feedback-link">
+                <a href="feedback.html">Feedback</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="welcome-section">
+            <h2>Plan Your Perfect Event</h2>
+            <p>Select your event type to get started</p>
+            <div class="button-container">
+                <a href="individual.html" class="cta-button">For Individuals</a>
+                <a href="organisation.html" class="cta-button">For Organisations</a>
+            </div>
+        </section>
+
+        <section class="customer-feedback">
+            <h3>What Our Customers Say</h3>
+            <div class="feedback-grid">
+                <div class="feedback-card">
+                
+                        <img src="https://images.pexels.com/photos/2747449/pexels-photo-2747449.jpeg?cs=srgb&dl=pexels-wolfgang-1002140-2747449.jpg&fm=jpg" class="feedback-photo">
+                    <p>"Happy Moments made our wedding unforgettable. The banquet hall was stunning and perfectly decorated!"</p>
+                    <strong>- Ankit Sharma</strong>
+                </div>
+                <div class="feedback-card">
+                    <img src="https://godreamcast.com/blog/wp-content/uploads/2024/12/conference-inperson-events-1024x682.jpg" class="feedback-photo">
+                    <p>"Organising our corporate event was seamless. The catering options were fantastic and the price filter helped us stay on budget."</p>
+                    <strong>- Chandan</strong>
+                </div>
+                <div class="feedback-card">
+                    <img src="https://m.media-amazon.com/images/I/61E3iWT1NiL.jpg"  class="feedback-photo">
+                    <p>"Found the perfect resort for my birthday party. The popularity sorting really helped me choose the best!"</p>
+                    <strong>- Prabhat</strong>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p></p>
+    </footer>
+
+    <script>
+        // Ensure CTA links always route through login when the user is not authenticated.
+        (function(){
+            function setupCTAs(){
+                var links = document.querySelectorAll('a.cta-button');
+                links.forEach(function(a){
+                    var orig = a.getAttribute('href') || '';
+                    // store the original intended destination
+                    a.dataset.target = orig;
+
+                    function updateHref(){
+                        var logged = false;
+                        try{ logged = localStorage.getItem('hm_loggedIn') === 'true'; } catch(e){}
+                        if(logged){
+                            a.setAttribute('href', a.dataset.target);
+                        } else {
+                            a.setAttribute('href', 'login.html?returnUrl=' + encodeURIComponent(a.dataset.target));
+                        }
+                    }
+
+                    // keep the link updated (in case auth changes without reload)
+                    updateHref();
+
+                    // final safety: prevent navigation if somehow the href points to the target while not logged in
+                    a.addEventListener('click', function(e){
+                        try{
+                            var logged = localStorage.getItem('hm_loggedIn') === 'true';
+                            if(logged) return; // allow
+                        } catch(err){}
+                        // allow native navigation to login link but prevent jumping to protected page
+                        var dst = a.dataset.target || '';
+                        if(dst && (dst.indexOf('individual.html') !== -1 || dst.indexOf('organisation.html') !== -1)){
+                            e.preventDefault();
+                            window.location.href = 'login.html?returnUrl=' + encodeURIComponent(dst);
+                        }
+                    });
+                });
+            }
+
+            if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', setupCTAs); else setupCTAs();
+        })();
+    </script>
+
+</body>
+</html>
